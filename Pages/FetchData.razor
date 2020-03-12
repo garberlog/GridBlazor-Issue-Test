@@ -1,0 +1,38 @@
+﻿@page "/"
+
+@using BugTest.Data
+@inject WeatherForecastService ForecastService
+@inject CRUDService CRUDService
+
+<h1>Weather forecast</h1>
+
+@if (forecasts == null) {
+    <p><em>Loading...</em></p>
+} else {
+    <GridComponent T="WeatherForecast" Grid="@forecasts"></GridComponent>
+}
+
+@code {
+    private CGrid<WeatherForecast> forecasts;
+
+    protected override async Task OnInitializedAsync() {
+        Action<IGridColumnCollection<WeatherForecast>> columns = c => {
+            c.Add(o => o.Date);
+            c.Add(o => o.Summary);
+            c.Add(o => o.TemperatureC);
+            c.Add(o => o.TemperatureF);
+
+        };
+        var query = new QueryDictionary<StringValues>();
+        var client = new GridClient<WeatherForecast>(q => ForecastService.GetForecastAsync(columns, q),
+            query, false, "RegistrationsGrid", columns)
+            .Crud(true, false, false, false, CRUDService)
+            .SetCreateComponent<Create>()
+            .SetStriped(true)
+            .Filterable();
+
+        forecasts = client.Grid;
+        // Set new items to grid
+        await client.UpdateGrid();
+    }
+}

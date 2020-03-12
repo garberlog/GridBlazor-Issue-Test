@@ -1,0 +1,17 @@
+﻿@inherits GridCreateComponent<WeatherForecast>
+@using BugTest.Data
+<h3>Create</h3>
+
+@if (test) {
+    <label>failed</label>
+} else {
+    <label>Succeeded</label>
+}
+@code {
+    bool test = true;
+
+    protected override async Task OnInitializedAsync() {
+        await Task.Delay(TimeSpan.FromSeconds(1));
+        test = false;
+    }
+}
